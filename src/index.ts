@@ -596,7 +596,7 @@ export default class Redlock extends EventEmitter {
       // One or more of the resources was already locked.
       if (result !== keys.length) {
         throw new ResourceLockedError(
-          `The operation was applied to: ${result} of the ${keys.length} requested resources.`
+          `The operation was applied to: ${result} of the ${keys.length} requested resources: ${JSON.stringify(keys)}.`
         );
       }
 
