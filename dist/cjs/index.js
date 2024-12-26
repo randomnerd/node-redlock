@@ -249,7 +249,7 @@ class Redlock extends events_1.EventEmitter {
         }
         // The lock has already expired.
         if (existing.expiration < Date.now()) {
-            throw new ExecutionError("Cannot extend an already-expired lock.", []);
+            throw new ExecutionError(`Cannot extend an already-expired lock. Keys: ${JSON.stringify(existing.resources)}`, []);
         }
         const { attempts, start } = await this._execute(this.scripts.extendScript, existing.resources, [existing.value, duration], settings);
         // Invalidate the existing lock.
@@ -291,7 +291,7 @@ class Redlock extends events_1.EventEmitter {
                 });
             }
             else {
-                throw new ExecutionError("The operation was unable to achieve a quorum during its retry window.", attempts);
+                throw new ExecutionError(`The operation was unable to achieve a quorum during its retry window. Keys: ${JSON.stringify(keys)}`, attempts);
             }
         }
     }
@@ -363,7 +363,7 @@ class Redlock extends events_1.EventEmitter {
                     ...args,
                 ]));
                 if (typeof shaResult !== "number") {
-                    throw new Error(`Unexpected result of type ${typeof shaResult} returned from redis.`);
+                    throw new Error(`Unexpected result of type ${typeof shaResult} returned from redis. Keys: ${JSON.stringify(keys)}`);
                 }
                 result = shaResult;
             }
@@ -379,7 +379,7 @@ class Redlock extends events_1.EventEmitter {
                     ...args,
                 ]));
                 if (typeof rawResult !== "number") {
-                    throw new Error(`Unexpected result of type ${typeof rawResult} returned from redis.`);
+                    throw new Error(`Unexpected result of type ${typeof rawResult} returned from redis. Keys: ${JSON.stringify(keys)}`);
                 }
                 result = rawResult;
             }
@@ -395,7 +395,7 @@ class Redlock extends events_1.EventEmitter {
         }
         catch (error) {
             if (!(error instanceof Error)) {
-                throw new Error(`Unexpected type ${typeof error} thrown with value: ${error}`);
+                throw new Error(`Unexpected type ${typeof error} thrown with value: ${error}. Keys: ${JSON.stringify(keys)}`);
             }
             // Emit the error on the redlock instance for observability.
             this.emit("error", error);

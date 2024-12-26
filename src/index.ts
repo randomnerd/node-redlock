@@ -377,7 +377,7 @@ export default class Redlock extends EventEmitter {
 
     // The lock has already expired.
     if (existing.expiration < Date.now()) {
-      throw new ExecutionError("Cannot extend an already-expired lock.", []);
+      throw new ExecutionError(`Cannot extend an already-expired lock. Keys: ${JSON.stringify(existing.resources)}`, []);
     }
 
     const { attempts, start } = await this._execute(
@@ -462,7 +462,7 @@ export default class Redlock extends EventEmitter {
         });
       } else {
         throw new ExecutionError(
-          "The operation was unable to achieve a quorum during its retry window.",
+          `The operation was unable to achieve a quorum during its retry window. Keys: ${JSON.stringify(keys)}`,
           attempts
         );
       }
@@ -565,7 +565,7 @@ export default class Redlock extends EventEmitter {
 
         if (typeof shaResult !== "number") {
           throw new Error(
-            `Unexpected result of type ${typeof shaResult} returned from redis.`
+            `Unexpected result of type ${typeof shaResult} returned from redis. Keys: ${JSON.stringify(keys)}`
           );
         }
 
@@ -586,7 +586,7 @@ export default class Redlock extends EventEmitter {
 
         if (typeof rawResult !== "number") {
           throw new Error(
-            `Unexpected result of type ${typeof rawResult} returned from redis.`
+            `Unexpected result of type ${typeof rawResult} returned from redis. Keys: ${JSON.stringify(keys)}`
           );
         }
 
@@ -608,7 +608,7 @@ export default class Redlock extends EventEmitter {
     } catch (error) {
       if (!(error instanceof Error)) {
         throw new Error(
-          `Unexpected type ${typeof error} thrown with value: ${error}`
+          `Unexpected type ${typeof error} thrown with value: ${error}. Keys: ${JSON.stringify(keys)}`
         );
       }
 
